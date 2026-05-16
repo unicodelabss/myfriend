@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Website Builder 🎂</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Dancing+Script:wght@700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+    <style>
+        body { font-family: 'Poppins', sans-serif; transition: all 0.5s; }
+        .font-birthday { font-family: 'Dancing Script', cursive; }
+        .font-hand { font-family: 'Kalam', cursive; }
+        #viewer-section { display: none; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+    <!-- SECTION 1: ADMIN BUILDER (Jahan details bharni hain) -->
+    <div id="admin-section" class="min-h-screen p-6 flex flex-col items-center">
+        <div class="max-w-2xl w-full bg-white p-8 rounded-3xl shadow-xl">
+            <h1 class="text-3xl font-bold text-center text-pink-600 mb-8">Website Gift Builder 🎁</h1>
+            
+            <div class="space-y-6">
+                <!-- Input Fields -->
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Dost ka Naam:</label>
+                    <input type="text" id="in-name" placeholder="Aditi" class="w-full p-3 border rounded-xl outline-pink-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Special Birthday Message:</label>
+                    <textarea id="in-msg" rows="4" placeholder="Birthday par kuch pyaara sa likho..." class="w-full p-3 border rounded-xl outline-pink-500"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Photos ke URL (Comma lagakar):</label>
+                    <p class="text-[10px] text-gray-400 mb-2">*Photos upload karke uska direct link yahan paste karein</p>
+                    <input type="text" id="in-photos" placeholder="link1.jpg, link2.jpg" class="w-full p-3 border rounded-xl outline-pink-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Secret Password:</label>
+                        <input type="text" id="in-pass" placeholder="cake123" class="w-full p-3 border rounded-xl outline-pink-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Theme Color:</label>
+                        <select id="in-theme" class="w-full p-3 border rounded-xl outline-pink-500">
+                            <option value="pink">Soft Pink</option>
+                            <option value="purple">Lavender Purple</option>
+                            <option value="blue">Sky Blue</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button onclick="generateLink()" class="w-full bg-pink-500 text-white p-4 rounded-xl font-bold text-lg hover:bg-pink-600 shadow-lg">
+                    MAGIC LINK GENERATE KAREIN ✨
+                </button>
+            </div>
+
+            <!-- Generated Link Output -->
+            <div id="link-output" class="mt-8 hidden p-4 bg-pink-50 rounded-2xl border-2 border-dashed border-pink-200">
+                <p class="text-xs font-bold text-pink-600 mb-2 uppercase">Aapka Special Link Taiyar Hai:</p>
+                <input type="text" id="final-url" readonly class="w-full p-2 bg-white text-xs border rounded mb-3">
+                <button onclick="copyUrl()" class="text-sm text-pink-500 font-bold underline">Link Copy Karein & Dost ko Bhejein</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 2: THE ACTUAL SURPRISE WEBSITE (Jo link kholne pe dikhega) -->
+    <div id="viewer-section">
+        <!-- Hero Section -->
+        <header id="view-header" class="h-screen flex flex-col items-center justify-center text-center p-6 bg-pink-50">
+            <h1 id="out-name" class="font-birthday text-6xl md:text-8xl text-pink-600 mb-6" data-aos="zoom-in"></h1>
+            <p class="text-xl text-gray-500 italic animate-pulse">Happy Birthday to you! ✨</p>
+            <div class="mt-20"><i class="fa-solid fa-chevron-down text-2xl text-gray-300"></i></div>
+        </header>
+
+        <!-- Message Section -->
+        <section class="py-24 px-6 bg-white">
+            <div class="max-w-3xl mx-auto p-10 rounded-[3rem] border-2 border-dashed border-pink-200 text-center" data-aos="fade-up">
+                <h2 class="font-birthday text-4xl mb-8 text-pink-500">Special Message</h2>
+                <p id="out-msg" class="font-hand text-3xl text-gray-700 leading-relaxed"></p>
+            </div>
+        </section>
+
+        <!-- Photo Gallery -->
+        <section class="py-24 px-6 bg-pink-50">
+            <h2 class="text-center font-birthday text-4xl mb-12">Our Beautiful Memories</h2>
+            <div id="out-gallery" class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                <!-- JS will fill photos here -->
+            </div>
+        </section>
+
+        <footer class="py-10 text-center text-gray-400 text-xs">
+            Created with ❤️ using Gift Builder
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        // 1. GENERATE LINK LOGIC
+        function generateLink() {
+            const data = {
+                name: document.getElementById('in-name').value,
+                msg: document.getElementById('in-msg').value,
+                photos: document.getElementById('in-photos').value.split(','),
+                pass: document.getElementById('in-pass').value,
+                theme: document.getElementById('in-theme').value
+            };
+
+            // URL mein data encode karke bhejna (Base64)
+            const stringData = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+            const finalUrl = window.location.origin + window.location.pathname + '?gift=' + stringData;
+            
+            document.getElementById('final-url').value = finalUrl;
+            document.getElementById('link-output').classList.remove('hidden');
+        }
+
+        function copyUrl() {
+            const copyText = document.getElementById("final-url");
+            copyText.select();
+            document.execCommand("copy");
+            alert("Link Copy Ho Gaya! Ab ise WhatsApp par bhejein.");
+        }
+
+        // 2. VIEW LOGIC (URL check karna)
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const giftData = urlParams.get('gift');
+
+            if (giftData) {
+                // Agar URL mein data hai, toh viewer mode dikhao
+                document.getElementById('admin-section').style.display = 'none';
+                document.getElementById('viewer-section').style.display = 'block';
+                
+                try {
+                    const decodedData = JSON.parse(decodeURIComponent(escape(atob(giftData))));
+                    renderWebsite(decodedData);
+                } catch (e) {
+                    console.error("Invalid link");
+                }
+            }
+        }
+
+        function renderWebsite(data) {
+            document.getElementById('out-name').innerText = "Happy Birthday, " + data.name + "!";
+            document.getElementById('out-msg').innerText = data.msg;
+            
+            const gallery = document.getElementById('out-gallery');
+            data.photos.forEach(url => {
+                if(url.trim() !== "") {
+                    const imgDiv = document.createElement('div');
+                    imgDiv.className = "bg-white p-3 shadow-lg rotate-2 hover:rotate-0 transition-all duration-500";
+                    imgDiv.innerHTML = `<img src="${url.trim()}" class="w-full h-64 object-cover">`;
+                    gallery.appendChild(imgDiv);
+                }
+            });
+
+            // Theme Setting
+            if(data.theme === 'purple') {
+                document.getElementById('view-header').className = "h-screen flex flex-col items-center justify-center text-center p-6 bg-purple-50 text-purple-600";
+                document.body.style.backgroundColor = "#faf5ff";
+            } else if(data.theme === 'blue') {
+                document.getElementById('view-header').className = "h-screen flex flex-col items-center justify-center text-center p-6 bg-blue-50 text-blue-600";
+                document.body.style.backgroundColor = "#f0f9ff";
+            }
+
+            AOS.init({ duration: 1000 });
+        }
+    </script>
+</body>
+</html>
